@@ -37,6 +37,8 @@ extern void test_relay_health(void);
 extern void test_relay_session(void);
 extern void test_capsule_mux(void);
 extern void test_journal_file(void);
+extern void test_route_discovery(void);
+extern void test_telemetry_agg(void);
 
 int main(void) {
   printf("folden tests\n");
@@ -74,6 +76,8 @@ int main(void) {
   test_relay_session();
   test_capsule_mux();
   test_journal_file();
+  test_route_discovery();
+  test_telemetry_agg();
 
   if (g_failed != 0) {
     fprintf(stderr, "%d assertion(s) failed\n", g_failed);

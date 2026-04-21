@@ -53,10 +53,22 @@ set(FOLDEN_SRC
   src/relay_session.c
   src/capsule_mux.c
   src/journal_file.c
+  src/route_discovery.c
+  src/telemetry_agg.c
+  src/sha256.c
+  src/handshake.c
+  src/json_parser.c
+  src/config_manager.c
+  src/tag_signature.c
+  src/access_log.c
+  src/metrics_exporter.c
+  src/metrics_push.c
 )
 
 add_library(folden STATIC ${FOLDEN_SRC})
 target_include_directories(folden PUBLIC include)
+find_package(Threads REQUIRED)
+target_link_libraries(folden Threads::Threads)
 target_include_directories(folden PRIVATE src)
 
 add_executable(folden-inspect tools/folden-inspect.c tools/capsule_wire.c)
@@ -98,6 +110,8 @@ add_executable(folden-tests
   tests/test_relay_session.c
   tests/test_capsule_mux.c
   tests/test_journal_file.c
+  tests/test_route_discovery.c
+  tests/test_telemetry_agg.c
   tools/capsule_wire.c
 )
 target_link_libraries(folden-tests folden)
