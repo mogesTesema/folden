@@ -47,6 +47,12 @@ set(FOLDEN_SRC
   src/vault_registry.c
   src/recovery.c
   src/folden.c
+  src/wire_compress.c
+  src/flow_control.c
+  src/relay_health.c
+  src/relay_session.c
+  src/capsule_mux.c
+  src/journal_file.c
 )
 
 add_library(folden STATIC ${FOLDEN_SRC})
@@ -86,6 +92,12 @@ add_executable(folden-tests
   tests/test_wire_validator.c
   tests/test_route_cache_freshness.c
   tests/test_emit_cache_invalidation.c
+  tests/test_wire_compress.c
+  tests/test_flow_control.c
+  tests/test_relay_health.c
+  tests/test_relay_session.c
+  tests/test_capsule_mux.c
+  tests/test_journal_file.c
   tools/capsule_wire.c
 )
 target_link_libraries(folden-tests folden)

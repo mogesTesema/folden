@@ -25,7 +25,9 @@ typedef enum folden_status {
   FOLDEN_ERR_BAD_TAG = -5,
   FOLDEN_ERR_FOLD_DEPTH = -6,
   FOLDEN_ERR_NOMEM = -7,
-  FOLDEN_ERR_BAD_STATE = -8
+  FOLDEN_ERR_BAD_STATE = -8,
+  FOLDEN_ERR_THROTTLED = -9,
+  FOLDEN_ERR_CHECKSUM = -10
 } folden_status_t;
 
 typedef enum folden_tag_id {

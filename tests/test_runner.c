@@ -31,6 +31,13 @@ extern void test_capsule_cache_register(void);
 extern void test_defer_free_register(void);
 extern void test_vault_registry_register(void);
 
+extern void test_wire_compress(void);
+extern void test_flow_control(void);
+extern void test_relay_health(void);
+extern void test_relay_session(void);
+extern void test_capsule_mux(void);
+extern void test_journal_file(void);
+
 int main(void) {
   printf("folden tests\n");
   run_varfold_tests();
@@ -60,6 +67,14 @@ int main(void) {
   test_capsule_cache_register();
   test_defer_free_register();
   test_vault_registry_register();
+
+  test_wire_compress();
+  test_flow_control();
+  test_relay_health();
+  test_relay_session();
+  test_capsule_mux();
+  test_journal_file();
+
   if (g_failed != 0) {
     fprintf(stderr, "%d assertion(s) failed\n", g_failed);
     return 1;
