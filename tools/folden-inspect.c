@@ -4,6 +4,10 @@
 
 #include "capsule_wire.h"
 #include "folden/folden.h"
+#include "../src/relay_health.h"
+#include "../src/capsule_mux.h"
+#include "../src/flow_control.h"
+#include "../src/relay_session.h"
 
 static uint8_t *read_file(const char *path, size_t *out_len) {
   FILE *f = fopen(path, "rb");
@@ -41,7 +45,9 @@ static void usage(const char *argv0) {
           "  inspect <capsule.bin>                 decode and summarize a capsule\n"
           "  stats <capsule.bin>                    adopt + emit, then print per-lane stats\n"
           "  routes <capsule.bin> <next_hop:cost>*  adopt, register routes, print lookups\n"
-          "  configure <capsule.bin> <conf.txt>     adopt, apply config, tick, print journal state\n",
+          "  configure <capsule.bin> <conf.txt>     adopt, apply config, tick, print journal state\n"
+          "  health <capsule.bin>                  simulate traffic and dump health metrics\n"
+          "  mux <capsule1.bin> [capsule2.bin...]  multiplex capsules into a stream and unpack\n",
           argv0);
 }
 
@@ -211,6 +217,87 @@ static int cmd_configure(int argc, char **argv) {
   return 0;
 }
 
+static int cmd_health(const char *path) {
+  size_t len = 0;
+  uint8_t *buf = read_file(path, &len);
+  if (!buf) return 1;
+
+  folden_capsule_t *cap = NULL;
+  if (folden_decode_buffer(buf, len, &cap) != FOLDEN_OK) {
+    free(buf);
+    return 1;
+  }
+
+  folden_relay_health_t *health = folden_health_create(50);
+  folden_flow_ctrl_t *flow = folden_flow_create(10.0, 50.0, 0);
+
+  size_t lanes = folden_capsule_lane_count(cap);
+  for (size_t i = 0; i < lanes; i++) {
+    uint32_t lane_id = folden_capsule_lane_id(cap, i);
+    if (folden_flow_check(flow, lane_id, 0) == FOLDEN_OK) {
+      folden_flow_consume(flow, lane_id);
+      folden_health_record_adopt(health, lane_id, 120 + i * 5); // dummy latency
+      folden_health_record_emit(health, lane_id, 40 + i * 2);
+    }
+  }
+
+  folden_health_record_queue_overflow(health);
+  folden_health_tick(health);
+  folden_flow_tick(flow);
+
+  char dump_buf[2048];
+  folden_health_dump(health, dump_buf, sizeof(dump_buf));
+  printf("--- Health Dump ---\n%s", dump_buf);
+
+  folden_health_destroy(health);
+  folden_flow_destroy(flow);
+  folden_capsule_free(cap);
+  free(buf);
+  return 0;
+}
+
+static void mux_cb(const uint8_t *wire, size_t wire_len, void *user) {
+  size_t *count = (size_t *)user;
+  (*count)++;
+  printf("demuxed capsule %zu: %zu bytes\n", *count, wire_len);
+}
+
+static int cmd_mux(int argc, char **argv) {
+  if (argc < 3) return 1;
+  
+  size_t count = argc - 2;
+  const uint8_t **payloads = malloc(count * sizeof(uint8_t *));
+  size_t *lengths = malloc(count * sizeof(size_t));
+  
+  for (size_t i = 0; i < count; i++) {
+    uint8_t *b = read_file(argv[2 + i], &lengths[i]);
+    if (!b) {
+      for (size_t j = 0; j < i; j++) free((void *)payloads[j]);
+      free(payloads); free(lengths);
+      return 1;
+    }
+    payloads[i] = b;
+  }
+
+  folden_mux_frame_t frame;
+  folden_status_t st = folden_mux_pack(payloads, lengths, count, &frame);
+  if (st != FOLDEN_OK) {
+    fprintf(stderr, "mux pack failed\n");
+    return 1;
+  }
+  printf("packed %zu capsules into %zu bytes\n", count, frame.len);
+
+  folden_mux_stream_t *ms = folden_mux_stream_create();
+  size_t demux_count = 0;
+  folden_mux_stream_feed(ms, frame.buf, frame.len, mux_cb, &demux_count);
+  
+  folden_mux_stream_destroy(ms);
+  folden_mux_frame_free(&frame);
+  for (size_t i = 0; i < count; i++) free((void *)payloads[i]);
+  free(payloads); free(lengths);
+  return 0;
+}
+
 int main(int argc, char **argv) {
   if (argc < 2) {
     usage(argv[0]);
@@ -227,6 +314,12 @@ int main(int argc, char **argv) {
   }
   if (strcmp(argv[1], "configure") == 0) {
     return cmd_configure(argc, argv);
+  }
+  if (strcmp(argv[1], "health") == 0 && argc == 3) {
+    return cmd_health(argv[2]);
+  }
+  if (strcmp(argv[1], "mux") == 0) {
+    return cmd_mux(argc, argv);
   }
   usage(argv[0]);
   return 2;
