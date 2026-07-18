@@ -1,0 +1,10 @@
+homepage: "https://github.com/mogesTesema/folden"
+language: c
+primary_contact: "moges2421@gmail.com"
+main_repo: "https://github.com/mogesTesema/folden"
+fuzzing_engines:
+  - libfuzzer
+sanitizers:
+  - address
+architectures:
+  - x86_64
