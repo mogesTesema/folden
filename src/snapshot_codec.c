@@ -84,8 +84,7 @@ folden_status_t folden_snapshot_codec_restore(folden_vault_t *vault,
 
   folden_slab_arena_t *arena = folden_arena_get_global();
   for (size_t i = 0; i < relay->count; i++) {
-    // Defer cleanup of old tag/meta pointers before reallocation.
-    // This ensures no dangling references if the arena is swept.
+    // clean up old tag/meta pointers before we overwrite the entry array
     if (relay->defer) {
       if (relay->entries[i].cached_tags) {
          folden_defer_enqueue_ptr(relay->defer, relay->entries[i].cached_tags);

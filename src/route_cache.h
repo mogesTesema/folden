@@ -13,9 +13,7 @@ void folden_route_cache_pin(folden_route_cache_t *c, uint32_t lane, uint32_t gen
 const uint8_t *folden_route_cache_lookup(folden_route_cache_t *c, uint32_t lane,
     uint32_t gen, size_t *out_len);
 
-/* Marks every entry for this lane as invalid, regardless of generation.
- * Must be called whenever the lane's backing memory is released out from
- * under a pinned entry, or lookup can hand back a dangling pointer. */
+/* Drop all entries for this lane so stale cached data is never returned. */
 void folden_route_cache_invalidate_lane(folden_route_cache_t *c, uint32_t lane);
 
 #endif

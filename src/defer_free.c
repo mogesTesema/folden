@@ -82,13 +82,8 @@ void folden_defer_drain(folden_defer_free_t *df, uint32_t epoch) {
       continue;
     }
     if (it->is_arena) {
-      /* Respect an outstanding borrow (e.g. a vault snapshot or a
-       * zero-copy emit) rather than force-freeing out from under it.
-       * folden_arena_free_token silently no-ops if the token is still
-       * borrowed; nothing re-attempts the free afterward, so a token whose
-       * borrow outlives this drain call leaks rather than dangling. That
-       * tradeoff is intentional -- it's the same one folden_relay_release
-       * and folden_relay_destroy_impl make. */
+      /* skip tokens that are still borrowed -- free_token no-ops in
+       * that case and the caller is responsible for the lifetime. */
       folden_arena_free_token(arena, it->arena_token);
     } else {
       free(it->ptr);

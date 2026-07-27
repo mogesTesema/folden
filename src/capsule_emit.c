@@ -90,11 +90,8 @@ folden_status_t folden_capsule_emit_impl(const folden_capsule_t *capsule,
 
     if (rent && rent->slab && lane->has_vault_gen &&
         rent->generation != lane->vault_gen) {
-      /* The route/capsule caches may still hold a pin into rent->slab from
-       * whichever generation was live before this one -- invalidate them
-       * before the block they alias is deferred for freeing, or a later
-       * lookup keyed on that older generation hands back a dangling
-       * pointer once a scheduler tick drains the deferred token. */
+      /* generation changed -- flush any cached refs that belong to the
+       * old generation so later lookups don't return stale data. */
       if (relay && relay->route_cache) {
         folden_route_cache_invalidate_lane(relay->route_cache, lane->lane_id);
       }

@@ -42,12 +42,8 @@ void folden_relay_destroy_impl(folden_relay_t *relay) {
     return;
   }
   folden_defer_drain(relay->defer, UINT32_MAX);
-  /* The relay owns every entry's backing memory outright regardless of its
-   * logical refcount -- adopt/release only tracks how many callers are
-   * still "interested", it doesn't imply anyone else holds the pointer.
-   * The one exception is an outstanding zero-copy borrow (arena_borrows);
-   * folden_arena_free_token already refuses to free a still-borrowed arena
-   * block, so that case degrades to a leak rather than a use-after-free. */
+  /* arena_borrows tracks outstanding zero-copy refs; free_token
+   * quietly skips still-borrowed blocks so the worst case is a leak. */
   for (size_t i = 0; i < relay->count; i++) {
     if (relay->entries[i].arena_token) {
       folden_arena_free_token(folden_arena_get_global(),
