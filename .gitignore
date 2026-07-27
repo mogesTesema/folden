@@ -1,0 +1,8 @@
+build/
+build-fuzz/
+*.o
+*.a
+.DS_Store
+
+build-fuzz-out/
+.scratch_pocs/
