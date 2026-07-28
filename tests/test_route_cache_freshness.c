@@ -3,10 +3,6 @@
 #include "capsule_wire.h"
 #include "folden/folden.h"
 
-/* folden_route_cache_pin used to append a new entry on every call instead
- * of updating an existing (lane_id, generation) match in place, so a
- * re-adopt of the same lane left a stale entry pointing at memory that a
- * later scheduler tick would free -- and lookup returns the first match. */
 TEST(test_readopt_then_tick_then_emit_uses_fresh_slab) {
   folden_wire_tag_t tags[] = {{2, 0, 5}};
   folden_wire_lane_t la = {3, tags, 1, (const uint8_t *)"bbbbb", 5, 5, 1};

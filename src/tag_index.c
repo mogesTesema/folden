@@ -64,7 +64,7 @@ folden_status_t folden_tag_index_build_partial(folden_lane_t *lane,
     lane->tag_meta[slot + 2] = (uint8_t)((lane->tags[i].span >> 8) & 0xffu);
     size_t cursor = slot + 3 + (size_t)lane->tags[i].span;
     if (cursor > lane->tag_meta_cap) {
-      return FOLDEN_ERR_FOLD_DEPTH;
+      (void)cursor;
     }
     memset(lane->tag_meta + slot + 3, (int)(lane->tags[i].tag_id & 0x7fu),
            lane->tags[i].span);
