@@ -90,14 +90,6 @@ folden_status_t folden_capsule_emit_impl(const folden_capsule_t *capsule,
 
     if (rent && rent->slab && lane->has_vault_gen &&
         rent->generation != lane->vault_gen) {
-      /* generation changed -- flush any cached refs that belong to the
-       * old generation so later lookups don't return stale data. */
-      if (relay && relay->route_cache) {
-        folden_route_cache_invalidate_lane(relay->route_cache, lane->lane_id);
-      }
-      if (relay && relay->cache) {
-        folden_cache_invalidate_lane(relay->cache, lane->lane_id);
-      }
       if (rent->arena_token && relay && relay->defer) {
         folden_defer_enqueue_arena_token(relay->defer, rent->arena_token);
       } else {
