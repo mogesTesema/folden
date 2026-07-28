@@ -46,10 +46,6 @@ folden_status_t folden_snapshot_codec_capture(folden_vault_t *vault,
       uint8_t *ap = folden_arena_ptr(arena, relay->entries[i].arena_token);
       if (ap) {
         vault->snapshot[i].slab = ap;
-        /* Protect this block from being freed out from under the snapshot
-         * until the snapshot itself is superseded or the vault is
-         * destroyed (see release_snapshot_borrows). */
-        folden_arena_borrow(arena, relay->entries[i].arena_token);
       }
     }
     if (relay->entries[i].cached_tags && relay->entries[i].cached_tag_count > 0) {
