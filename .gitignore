@@ -6,3 +6,6 @@ build-fuzz/
 
 build-fuzz-out/
 .scratch_pocs/
+deliverables/
+build-verify-*/
+afterquery-instruction-fenrir.md
