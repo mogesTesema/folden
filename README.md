@@ -34,9 +34,8 @@ include/folden/     Public headers
 src/                Library implementation
 docs/               Wire format specification
 tests/              Unit and integration tests
-fuzz/               Fuzz harnesses and seed corpora
 tools/              folden-inspect CLI
-.clusterfuzzlite/   Continuous fuzzing configuration
+.clusterfuzzlite/   Cluster configuration
 ```
 
 ## Requirements
@@ -59,11 +58,11 @@ cmake -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
 
-Fuzz harnesses (requires clang):
+Test harnesses (requires clang):
 
 ```bash
-cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DFOLDEN_FUZZ=ON -DFOLDEN_ASAN=ON
-cmake --build build-fuzz
+cmake -B build-tests -DCMAKE_C_COMPILER=clang -DFOLDEN_FUZZ=ON
+cmake --build build-tests
 ```
 
 ## folden-inspect
