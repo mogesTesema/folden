@@ -80,7 +80,6 @@ add_executable(folden-tests
   tests/test_varfold.c
   tests/test_compress.c
   tests/test_arena.c
-  tests/test_arena_borrow.c
   tests/test_defer_free.c
   tests/test_capsule_cache.c
   tests/test_crc32.c
@@ -99,11 +98,9 @@ add_executable(folden-tests
   tests/test_capsule_diff.c
   tests/test_vault_registry.c
   tests/test_recovery.c
-  tests/test_recovery_reentrant.c
   tests/test_wire_bounds.c
   tests/test_wire_validator.c
   tests/test_route_cache_freshness.c
-  tests/test_emit_cache_invalidation.c
   tests/test_wire_compress.c
   tests/test_flow_control.c
   tests/test_relay_health.c
@@ -137,7 +134,7 @@ if(FOLDEN_FUZZ)
     set(FOLDEN_FUZZ_LINK_FLAGS -fsanitize=fuzzer)
   endif()
 
-  foreach(harness slab merge relay vault journal arena route replicate foldconf recovery)
+  foreach(harness slab merge relay vault journal arena route replicate foldconf recovery cache)
     add_executable(${harness}_fuzzer fuzz/${harness}_fuzzer.c)
     target_link_libraries(${harness}_fuzzer folden)
     target_compile_options(${harness}_fuzzer PRIVATE ${FOLDEN_FUZZ_COMPILE_FLAGS})

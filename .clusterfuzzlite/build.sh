@@ -35,7 +35,7 @@ cmake -S "$REPO_ROOT" -B "$BUILD_DIR" \
   -DFOLDEN_FUZZ=ON \
   "${CMAKE_EXTRA_ARGS[@]}"
 
-FUZZERS=(slab_fuzzer merge_fuzzer relay_fuzzer vault_fuzzer journal_fuzzer arena_fuzzer route_fuzzer replicate_fuzzer foldconf_fuzzer recovery_fuzzer)
+FUZZERS=(slab_fuzzer merge_fuzzer relay_fuzzer vault_fuzzer journal_fuzzer arena_fuzzer route_fuzzer replicate_fuzzer foldconf_fuzzer recovery_fuzzer cache_fuzzer)
 cmake --build "$BUILD_DIR" -j"$(nproc)" --target "${FUZZERS[@]}"
 
 for t in "${FUZZERS[@]}"; do
