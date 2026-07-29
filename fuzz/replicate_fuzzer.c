@@ -6,8 +6,7 @@
 
 /* Drives the replication/quorum API through a sequence of fuzzer-chosen
  * operations against a small, fixed set of peer IDs, rather than one fixed
- * call order -- the ordering that reaches any bug has to be discovered by
- * mutation, matching how the real state machine would actually be driven
+ * call order, matching how the real state machine would actually be driven
  * over time by many independent peers acking/retrying out of lockstep. */
 #ifdef __cplusplus
 extern "C" {

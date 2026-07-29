@@ -19,14 +19,25 @@ static int read_pair(const uint8_t *data, size_t size, const uint8_t **a,
   return 0;
 }
 
+static void release_all_lanes(folden_relay_t *relay, const folden_capsule_t *cap) {
+  size_t lanes = folden_capsule_lane_count(cap);
+  for (size_t i = 0; i < lanes; i++) {
+    folden_relay_release(relay, folden_capsule_lane_id(cap, i));
+  }
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-  if (!data || size < 3) {
+  if (!data || size < 4) {
     return 0;
   }
+  uint8_t flags = data[0];
+  data++;
+  size--;
+
   const uint8_t *a = NULL;
   const uint8_t *b = NULL;
   size_t a_len = 0;
@@ -47,15 +58,32 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   folden_relay_t *relay = folden_relay_create();
   folden_vault_t *vault = folden_vault_create();
+
   folden_relay_adopt(relay, ca);
-  folden_vault_checkpoint(vault, relay);
+  if (flags & 0x1) {
+    folden_vault_checkpoint(vault, relay);
+  }
   folden_relay_adopt(relay, cb);
   folden_merge_lanes(ca, cb, relay);
-  folden_vault_restore(vault, relay);
+
+  if (flags & 0x2) {
+    /* Fuzzer-driven early release: exercises whatever bookkeeping the
+     * relay/cache/vault layers rely on to stay consistent when a lane's
+     * refcount drops to zero at an arbitrary point in the sequence, not
+     * just at the end. */
+    release_all_lanes(relay, ca);
+  }
+
+  if ((flags & 0x1) && (flags & 0x4)) {
+    folden_vault_restore(vault, relay);
+  }
 
   uint8_t *out = NULL;
   size_t out_len = 0;
   folden_emit_capsule(ca, relay, &out, &out_len);
+  free(out);
+  out = NULL;
+  folden_emit_capsule(cb, relay, &out, &out_len);
   free(out);
 
   folden_vault_destroy(vault);
