@@ -33,10 +33,9 @@ static route_cache_entry_t *route_cache_find(folden_route_cache_t *c, uint32_t l
 void folden_route_cache_pin(folden_route_cache_t *c, uint32_t lane, uint32_t gen,
     const uint8_t *slab, size_t len) {
   if (!c || !slab) return;
-  /* Re-pinning the same (lane, generation) must update the existing entry
-   * in place, not append a duplicate -- lookup returns the first match, so
-   * a stale duplicate left behind by a re-adopt would keep aliasing memory
-   * that's since been freed out from under it. */
+  /* Re-pinning the same (lane, generation) updates the existing entry in
+   * place rather than appending a duplicate, since lookup returns the
+   * first match. */
   route_cache_entry_t *e = route_cache_find(c, lane, gen);
   if (!e) {
     if (c->count >= c->cap) {

@@ -13,6 +13,7 @@ folden_status_t folden_relay_bump_generation_impl(folden_relay_t *relay, uint32_
                                                 uint32_t gen);
 
 folden_relay_entry_t *folden_relay_find(folden_relay_t *relay, uint32_t lane_id);
+int folden_relay_any_arena_borrowed(folden_relay_t *relay);
 folden_status_t folden_relay_queue_adopt_lane(folden_relay_t *relay,
                                               const folden_lane_t *lane);
 

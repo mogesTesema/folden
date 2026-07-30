@@ -95,6 +95,22 @@ folden_relay_entry_t *folden_relay_find(folden_relay_t *relay, uint32_t lane_id)
   return NULL;
 }
 
+/* Deferred arena reclamation is paused while any lane in this relay still
+ * has an outstanding zero-copy borrow -- draining while a caller might be
+ * mid-read anywhere in the relay isn't safe, so bookkeeping waits for a
+ * quiet point rather than a fixed delay. */
+int folden_relay_any_arena_borrowed(folden_relay_t *relay) {
+  if (!relay) {
+    return 0;
+  }
+  for (size_t i = 0; i < relay->count; i++) {
+    if (relay->entries[i].arena_borrows > 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static void relay_journal_append(folden_relay_t *relay,
                                  const folden_capsule_t *capsule) {
   if (!relay || !relay->journal || !capsule || !capsule->wire_copy) {
@@ -173,7 +189,7 @@ folden_status_t folden_relay_scheduler_tick_impl(folden_relay_t *relay) {
     return FOLDEN_ERR_BAD_STATE;
   }
   folden_status_t st = folden_journal_tick(relay->journal, relay->defer);
-  if (relay->defer) {
+  if (relay->defer && !folden_relay_any_arena_borrowed(relay)) {
     folden_defer_drain(relay->defer, UINT32_MAX);
   }
   return st;

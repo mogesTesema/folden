@@ -207,7 +207,9 @@ folden_status_t folden_relay_queue_flush(folden_relay_t *relay,
   if (!relay || !q) {
     return FOLDEN_ERR_BAD_STATE;
   }
-  folden_defer_drain(defer, UINT32_MAX);
+  if (!folden_relay_any_arena_borrowed(relay)) {
+    folden_defer_drain(defer, UINT32_MAX);
+  }
   for (size_t i = 0; i < q->count; i++) {
     apply_op_to_relay(relay, &q->ops[i], defer);
     free(q->ops[i].tags);
