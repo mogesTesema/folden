@@ -82,9 +82,7 @@ void folden_defer_drain(folden_defer_free_t *df, uint32_t epoch) {
       continue;
     }
     if (it->is_arena) {
-      /* skip tokens that are still borrowed -- free_token no-ops in
-       * that case and the caller is responsible for the lifetime. */
-      folden_arena_free_token(arena, it->arena_token);
+      folden_arena_reclaim_token(arena, it->arena_token);
     } else {
       free(it->ptr);
     }

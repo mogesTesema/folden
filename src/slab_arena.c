@@ -146,3 +146,22 @@ void folden_arena_free_token(folden_slab_arena_t *arena, uint32_t token) {
   }
 }
 
+/* Same as folden_arena_free_token, but for a block that has already sat in
+ * the deferred-free queue past its grace period -- reclaims the memory
+ * unconditionally rather than deferring indefinitely to a borrow that may
+ * never be released. */
+void folden_arena_reclaim_token(folden_slab_arena_t *arena, uint32_t token) {
+  if (!arena || token == 0) {
+    return;
+  }
+  for (size_t i = 0; i < arena->count; i++) {
+    if (arena->blocks[i].token == token && arena->blocks[i].live) {
+      free(arena->blocks[i].data);
+      arena->blocks[i].data = NULL;
+      arena->blocks[i].len = 0;
+      arena->blocks[i].live = 0;
+      return;
+    }
+  }
+}
+

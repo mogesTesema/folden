@@ -17,5 +17,6 @@ size_t folden_arena_len(folden_slab_arena_t *arena, uint32_t token);
 void folden_arena_borrow(folden_slab_arena_t *arena, uint32_t token);
 void folden_arena_release_borrow(folden_slab_arena_t *arena, uint32_t token);
 void folden_arena_free_token(folden_slab_arena_t *arena, uint32_t token);
+void folden_arena_reclaim_token(folden_slab_arena_t *arena, uint32_t token);
 
 #endif /* FOLDEN_SLAB_ARENA_H */
