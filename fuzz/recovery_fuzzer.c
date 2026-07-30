@@ -23,9 +23,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   size_t off = 0;
-  while (off + 1 < size) {
+  while (off + 2 < size) {
     uint8_t op = data[off++];
-    size_t chunk_len = data[off++];
+    size_t chunk_len = (size_t)data[off] | ((size_t)data[off + 1] << 8);
+    off += 2;
     if (chunk_len > size - off) {
       chunk_len = size - off;
     }
