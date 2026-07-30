@@ -37,6 +37,7 @@ size_t folden_recovery_replay_journal(folden_journal_t *journal, folden_relay_t 
       folden_capsule_free(cap);
       replayed++;
       cursor += consumed;
+      folden_journal_tick(journal, relay->defer);
     }
   }
 
