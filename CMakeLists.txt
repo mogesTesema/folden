@@ -134,7 +134,7 @@ if(FOLDEN_FUZZ)
     set(FOLDEN_FUZZ_LINK_FLAGS -fsanitize=fuzzer)
   endif()
 
-  foreach(harness slab merge relay vault journal arena route replicate foldconf recovery cache)
+  foreach(harness slab merge relay vault journal arena route replicate foldconf recovery cache defer vault_registry journal_file capsule_mux)
     add_executable(${harness}_fuzzer fuzz/${harness}_fuzzer.c)
     target_link_libraries(${harness}_fuzzer folden)
     target_compile_options(${harness}_fuzzer PRIVATE ${FOLDEN_FUZZ_COMPILE_FLAGS})

@@ -9,3 +9,8 @@ build-fuzz-out/
 deliverables/
 build-verify-*/
 afterquery-instruction-fenrir.md
+rejected-tasks/
+platform-fuzzed/
+tasks-diffcultiy-tips.md
+out.txt
+crash_corpus/
